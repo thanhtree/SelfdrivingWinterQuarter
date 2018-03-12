@@ -1,0 +1,2 @@
+data_collection:image_transport_tutorial:rplidar_ros
+-DCATKIN_DEVEL_PREFIX=/home/gabriel/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/gabriel/catkin_ws/install -G Unix Makefiles
