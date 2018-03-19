@@ -23,7 +23,7 @@ The neural network architecture that did work was a modified version of lenet. Y
 
 ## Installing Dependencies
 
-Make sure you ran `SelfdrivingWinterQuarter/raspberry_pi_installs/install_everything_for_raspbian_stretch.sh` on your Raspberry Pi 3. This will install almost all the dependencies you need for the Raspberry Pi. The only thing you are missing is OpenCV for C++, which will need to be built from source. Follow this tutorial to build OpenCV from source: https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/. While this tutorial shows you how to install OpenCV for python as well, you only need to finish up to and including step 5. Step 6 is just for the python version. The python version should already have been installed when you ran `install_everything_for_raspbian_stretch.sh`. Also be sure to **SKIP** the part on creating a virtual environment. Be sure to build OpenCV globally on your Raspberry Pi. This is because `install_everything_for_raspbian_stretch.sh` did not use a virtual environment when installing libraries.
+Make sure you ran `SelfdrivingWinterQuarter/raspberry_pi_installs/install_everything_for_raspbian_stretch.sh` on your Raspberry Pi 3. This will install all dependencies for raspberry pi.
 
 Make sure you also ran `SelfdrivingWinterQuarter/jetson_installs/install_opencv.sh` on your Jetson TX2 to install OpenCV for the Jetson. You will also need to build Tensorflow and Keras for gpu and their dependencies from source. Unfortunately, we do not have a bash shell script to automate that process. There are plenty of tutorials online.
 
