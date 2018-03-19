@@ -47,7 +47,6 @@ Connect the camera to the Raspberry Pi. Make sure you have a PS4 controller. Ope
 
 ```
  sudo ds4drv
-
 ```
 
 Now hold both the select and PS button on the PS4 controller until it starts flashing. The PS4 controller should eventually turn solid blue, indicating it is connected to the raspberry pi.
@@ -58,7 +57,6 @@ Here's an example command
 
 ```
 ./main.sh 1
-
 ```
  This will save your training data to `output_log1`, assuming you created the folder. If you wish to save to a different output_log, then change '1' to whatever number you want.
 
