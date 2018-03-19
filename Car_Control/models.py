@@ -1,3 +1,8 @@
+"""
+This program creates blank deep neural net models (modified lenet and nvidia) as .h5 files to be used by train_model.py. Instead of creating the neural nets in train_model.py, we create them here to keep programs as short as possible.
+"""
+
+
 import csv
 import cv2
 import matplotlib.pyplot as plt
@@ -57,7 +62,7 @@ print(modified_lenet_model.output_shape)
 modified_lenet_model.add(Dense(84, activation='relu'))
 modified_lenet_model.add(Dropout(0.25))
 print(modified_lenet_model.output_shape)
-modified_lenet_model.add(Dense(2))
+modified_lenet_model.add(Dense(1))
 
 modified_lenet_model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 modified_lenet_model.summary()

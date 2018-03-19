@@ -12,71 +12,141 @@ from keras.layers.pooling import MaxPooling2D
 from keras.regularizers import l2
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 import os
-
+import random
 import time
 
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 # import readchar
-import pigpio
+#import pigpio
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # comment line above and uncomment line below for linux
 # export TF_CPP_MIN_LOG_LEVEL = 2
 
-
-# model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=09_valLoss=0.019591.h5"
-model_path = "models/modified_lenet/4/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=64_epoch=0090_valLoss=0.003751.h5"
-
-
-# model_path = "models/nvidia/model_nvidia_adam_optimizer_epochs=10_trainloss=0.0523_valloss=0.0290.h5"
-# model_path = "models/nvidia/1/model_nvidia_lrFactor=0.100_batchSize=32_epoch=09_valLoss=0.028470.h5"
-# model_path = "models/modified_lenet/3/model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=0060_valLoss=0.011601.h5"
+model = "nvidia" # can be nvidia or modified_lenet
 
 # Define the input shape
 input_shape = (66, 200, 3)
 
-# Define modified lenet model
-modified_lenet_model = Sequential()
-print()
-print('Modified Lenet Model:\n')
-# pixel_normalized_and_mean_centered = pixel / 255 - 0.5
-modified_lenet_model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=input_shape))
-print(modified_lenet_model.output_shape)
-# modified_lenet_model.add(Convolution2D(nb_filter=6, nb_row=5, nb_col=5,
-#                        activation='relu', border_mode='valid',
-#                        subsample=(1, 1), dim_ordering='tf'))
-modified_lenet_model.add(Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
-print(modified_lenet_model.output_shape)
-modified_lenet_model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+if (model == "modified_lenet"):
+    # Using modified_lenet models from training 10 iterations
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=01_valLoss=0.017420.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=02_valLoss=0.014468.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=03_valLoss=0.012342.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=04_valLoss=0.009669.h5"
+    model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=05_valLoss=0.008395.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=06_valLoss=0.007865.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=07_valLoss=0.007962.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=08_valLoss=0.007365.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=09_valLoss=0.006645.h5"
+    #model_path = "models/modified_lenet/1/weights_only_model_modified_lenet_lrFactor=0.100_batchSize=32_epoch=10_valLoss=0.007456.h5"
 
-print(modified_lenet_model.output_shape)
-# modified_lenet_model.add(Convolution2D(nb_filter=16, nb_row=5, nb_col=5,
-#                        activation='relu', border_mode='valid',
-#                        subsample=(1, 1)))
-modified_lenet_model.add(Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
+    # Define modified lenet model
+    modified_lenet_model = Sequential()
+    print()
+    print('Modified Lenet Model:\n')
+    # pixel_normalized_and_mean_centered = pixel / 255 - 0.5
+    modified_lenet_model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=input_shape))
+    print(modified_lenet_model.output_shape)
+    # modified_lenet_model.add(Convolution2D(nb_filter=6, nb_row=5, nb_col=5,
+    #                        activation='relu', border_mode='valid',
+    #                        subsample=(1, 1), dim_ordering='tf'))
+    modified_lenet_model.add(Conv2D(filters=6, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
+    print(modified_lenet_model.output_shape)
+    modified_lenet_model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
 
-print(modified_lenet_model.output_shape)
-# modified_lenet_model.add(Convolution2D(nb_filter=36, nb_row=5, nb_col=5,
-#                        activation='relu', border_mode='valid',
-#                        subsample=(1, 1)))
-modified_lenet_model.add(Conv2D(filters=36, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
-print(modified_lenet_model.output_shape)
-modified_lenet_model.add(Flatten())
-print(modified_lenet_model.output_shape)
-modified_lenet_model.add(Dense(120, activation='relu'))
-modified_lenet_model.add(Dropout(0.25))
-print(modified_lenet_model.output_shape)
-modified_lenet_model.add(Dense(84, activation='relu'))
-modified_lenet_model.add(Dropout(0.25))
-print(modified_lenet_model.output_shape)
-modified_lenet_model.add(Dense(1))
+    print(modified_lenet_model.output_shape)
+    # modified_lenet_model.add(Convolution2D(nb_filter=16, nb_row=5, nb_col=5,
+    #                        activation='relu', border_mode='valid',
+    #                        subsample=(1, 1)))
+    modified_lenet_model.add(Conv2D(filters=16, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
 
-modified_lenet_model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-modified_lenet_model.summary()
+    print(modified_lenet_model.output_shape)
+    # modified_lenet_model.add(Convolution2D(nb_filter=36, nb_row=5, nb_col=5,
+    #                        activation='relu', border_mode='valid',
+    #                        subsample=(1, 1)))
+    modified_lenet_model.add(Conv2D(filters=36, kernel_size=(5, 5), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
+    print(modified_lenet_model.output_shape)
+    modified_lenet_model.add(Flatten())
+    print(modified_lenet_model.output_shape)
+    modified_lenet_model.add(Dense(120, activation='relu'))
+    modified_lenet_model.add(Dropout(0.25))
+    print(modified_lenet_model.output_shape)
+    modified_lenet_model.add(Dense(84, activation='relu'))
+    modified_lenet_model.add(Dropout(0.25))
+    print(modified_lenet_model.output_shape)
+    modified_lenet_model.add(Dense(1))
 
-modified_lenet_model.load_weights(model_path)
-model = modified_lenet_model
+    modified_lenet_model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+    modified_lenet_model.summary()
 
+    modified_lenet_model.load_weights(model_path)
+    model = modified_lenet_model
+
+if (model == "nvidia"):
+
+    # Using nvidia models from training 10 iterations
+    model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=01_valLoss=0.031086.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=02_valLoss=0.023957.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=03_valLoss=0.025302.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=04_valLoss=0.020549.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=05_valLoss=0.017960.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=06_valLoss=0.015531.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=07_valLoss=0.018099.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=08_valLoss=0.016283.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=09_valLoss=0.017435.h5"
+    #model_path = "models/nvidia/1/weights_only_model_nvidia_lrFactor=0.100_batchSize=32_epoch=10_valLoss=0.012025.h5"
+
+
+
+
+    # Define nvidia model
+    nvidia_model = Sequential()
+    print('Nvidia Model:\n')
+    # pixel_normalized_and_mean_centered = pixel / 255 - 0.5
+    nvidia_model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=input_shape))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Conv2D(filters=24, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu', data_format='channels_last'))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Conv2D(filters=36, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu', data_format='channels_last'))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Conv2D(filters=48, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu', data_format='channels_last'))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Conv2D(filters=64, kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu', data_format='channels_last'))
+    print(nvidia_model.output_shape)
+
+    nvidia_model.add(Flatten())
+    print(nvidia_model.output_shape)
+    nvidia_model.add(Dropout(0.25))
+
+    nvidia_model.add(Dense(100, activation='relu'))
+    print(nvidia_model.output_shape)
+    nvidia_model.add(Dropout(0.25))
+
+    nvidia_model.add(Dense(50, activation='relu'))
+    print(nvidia_model.output_shape)
+    nvidia_model.add(Dropout(0.25))
+
+    nvidia_model.add(Dense(10, activation='relu'))
+    print(nvidia_model.output_shape)
+    nvidia_model.add(Dropout(0.25))
+
+    nvidia_model.add(Dense(1))
+
+    nvidia_model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+    nvidia_model.summary()
+
+    nvidia_model.load_weights(model_path)
+    model = nvidia_model
+
+"""
 # Define pins used.
 servoPin = 24
 pi = pigpio.pi()
@@ -166,7 +236,7 @@ def left():
 def right():
     #PWMA2 and PWMB1 set high.
 	set_motor(0,0,1,0)
-
+"""
 
 
 
@@ -178,27 +248,28 @@ def preprocess(image):
     return result
 
 
-"""
+
 # for displaying actual vs. predicted angles on our own data
 file_name = 'data.p'
 
 with open(file_name, 'rb') as f:
-    angles, speeds, images = pickle.load(f)
-
-print('angles.shape: ', angles.shape)
-print('speeds.shape: ', speeds.shape)
-print('images.shape: ', images.shape)
+    samples = pickle.load(f)
 
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 fig, axs = plt.subplots(2, 5, figsize=(12, 5))
 axs = axs.ravel()
 count = 0
-for i in range(0, 10000, 1000):
-    image = images[i]
+
+for num in range(10):
+    i = random.randint(0,len(samples))
+    sample = samples[i]
+    actual_angle = sample[0]
+    image_path = sample[2]
+    image = Image.open(image_path)
+    image = np.asarray(image)
     image = preprocess(image)
     image_copy = np.copy(image)
-    actual_angle = angles[i]
     predicted_angle = float(model.predict(image[None, :, :, :], batch_size=1))*60.0
     predicted_angle = round(predicted_angle, 6)
     cv2.putText(image_copy, "Actual: %s" % (str(actual_angle)), (10, 20), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
@@ -206,13 +277,13 @@ for i in range(0, 10000, 1000):
     axs[count].imshow(image_copy)
     count += 1
 plt.show()
-"""
 
+"""
 cap = cv2.VideoCapture(0)
 
 # Make Car go forward at constant speed
 reverse()
-PWM = 10 # Defines the speed (ranges from 0 to 100)
+PWM = 50 # Defines the speed (ranges from 0 to 100)
 p1.ChangeDutyCycle(PWM)
 p2.ChangeDutyCycle(PWM)
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -222,20 +293,20 @@ while(True):
     t1 = time.time()
     ret, frame = cap.read()
     if (ret==True):
-    
+
         preprocessed_frame = preprocess(frame)
         predicted_angle = float(model.predict(preprocessed_frame[None, :, :, :], batch_size=1))*60.0
         t2 = time.time()
         delta = t2-t1
         setAngle(predicted_angle)
-        # print("delta: ", delta)
+        print("delta: ", delta)
         # print("predicted_angle: ", predicted_angle)
         print()
         # Display the resulting frame
         frame_copy = np.copy(frame)
         cv2.putText(frame_copy, "Angle: %s" % (str(predicted_angle)), (10, 20), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
         cv2.putText(frame_copy, "Time: %s" % (str(delta)), (10, 40), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
-        cv2.imshow('frame', frame_copy)
+        #cv2.imshow('frame', frame_copy)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         p1.ChangeDutyCycle(0)
         p2.ChangeDutyCycle(0)
@@ -249,5 +320,5 @@ p2.ChangeDutyCycle(0)
 stop()
 cap.release()
 cv2.destroyAllWindows()
-
+"""
 print('done')

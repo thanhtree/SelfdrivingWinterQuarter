@@ -13,9 +13,11 @@ from keras.layers.convolutional import Convolution2D, Conv2D
 from keras.layers.pooling import MaxPooling2D
 from keras.regularizers import l2
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
+from keras.optimizers import Adam
 import time
 from tensorflow.python.client import device_lib
 from augmentation_functions import *
+
 
 # print('printing list of devices')
 # print(device_lib.list_local_devices())
@@ -33,6 +35,7 @@ preprocess function:
 
 def preprocess(image):
     result = image[80:, :, :]
+    #result = image[50:, :, :]
     result = cv2.resize(result, (200, 66), interpolation=cv2.INTER_AREA)
     result = cv2.GaussianBlur(result, (3, 3), 0)
     result = cv2.cvtColor(result, cv2.COLOR_BGR2YUV)
@@ -68,12 +71,13 @@ def generator(samples, batch_size=32):
                 # augment image with 80% probability
                 # for each batch_sample, we are appending two samples: the original sample and the augmented sample
                 # so actual batch size is BATCH_SIZE * 2
+                """
                 augmented_image, augmented_angle = augment_image(original_image, angle, p=0.8)
                 angles.append(augmented_angle)
                 speeds.append(speed)
                 augmented_image = preprocess(augmented_image)
                 images.append(augmented_image)
-
+                """
 
 
             images = np.asarray(images)
@@ -111,8 +115,9 @@ if __name__ == '__main__':
     if (MODEL == "modified_lenet"):
         TRIAL_NUMBER = 5  # which sub-folder to save trained models to
         BATCH_SIZE = 32 # note: if we are augmenting images, then batch_size is actually twice this number
-        EPOCHS = 1 # number of iterations to train for
-        LR_FACTOR = 0.1  # factor by which to decrease learning rate if training plateaus
+        EPOCHS = 10 # number of iterations to train for
+        LR_FACTOR = 0.95  # factor by which to decrease learning rate if training plateaus
+        LEARNING_RATE = 0.001 # default is 0.001
 
         train_generator = generator(train_samples, batch_size=BATCH_SIZE)
         validation_generator = generator(validation_samples, batch_size=BATCH_SIZE)
@@ -120,13 +125,15 @@ if __name__ == '__main__':
         # reduce learning rate if model plateaus
         # factor defines the factor by which to reduce learning rate
         # patience defines how many epochs to wait during a plateau before reducing learning rate
-        reduce_lr = ReduceLROnPlateau(factor=LR_FACTOR, patience=2, epsilon=0.00001, verbose=1)
+        reduce_lr = ReduceLROnPlateau(factor=LR_FACTOR, patience=1, epsilon=0.00001, verbose=1)
 
-        model_save_path = ("models/modified_lenet/%d/weights_only_model_modified_lenet_lrFactor=%.3f_batchSize=%d_epoch={epoch:02d}_valLoss={val_loss:.6f}.h5" % (TRIAL_NUMBER, LR_FACTOR, BATCH_SIZE))
-        modelCheckpoint = ModelCheckpoint(filepath=model_save_path, monitor='val_loss', verbose=0, period=1, save_weights_only=1)  # save model after every epoch
+        #model_save_path = ("models/modified_lenet/%d/weights_only_model_modified_lenet_lrFactor=%.3f_batchSize=%d_epoch={epoch:02d}_valLoss={val_loss:.6f}.h5" % (TRIAL_NUMBER, LR_FACTOR, BATCH_SIZE))
+        model_save_path = ("models/modified_lenet/%d/weights_only_model_modified_lenet_epoch={epoch:d}.h5" % (TRIAL_NUMBER))
+        modelCheckpoint = ModelCheckpoint(filepath=model_save_path, monitor='val_loss', verbose=0, period=1, save_weights_only=1)  # save model after every so epochs; period defines how often to save the model
 
         modified_lenet_model = load_model('blank_modified_lenet_model.h5')
-        modified_lenet_model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+        optimizer = Adam(lr=LEARNING_RATE)
+        modified_lenet_model.compile(loss='mse', optimizer=optimizer, metrics=['accuracy'])
         modified_lenet_model.summary()
 
         history = modified_lenet_model.fit_generator(train_generator, steps_per_epoch=len(train_samples)/BATCH_SIZE, callbacks=[reduce_lr, modelCheckpoint], epochs=EPOCHS, validation_data=validation_generator, validation_steps=len(validation_samples)/BATCH_SIZE)

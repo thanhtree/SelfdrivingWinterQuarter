@@ -1,20 +1,36 @@
+"""
+This program reads in a list of textfiles which contain all the training examples and saves them to a pickle file for train_model.py to use. If you have more training examples from another text file you wish to add, append the path of that text file to the list "paths."
+"""
+
 import csv
 import numpy as np
 from PIL import Image
 import pickle
 import cv2
 import random
+import matplotlib.pyplot as plt
 
 
 def preprocess(image):
     result = image[80:, :, :]
+    #result = image[50:, :, :]
     result = cv2.resize(result, (200, 66), interpolation=cv2.INTER_AREA)
     result = cv2.GaussianBlur(result, (3, 3), 0)
     result = cv2.cvtColor(result, cv2.COLOR_BGR2YUV)
     return result
 
-# list of all data text files
-paths = ["output_logs/output_log2/output_log2.txt", "output_logs/output_log3/output_log3.txt"]
+output_log_numbers = [6,7,8,9,10,11,12,13,14] # I am currently saving data from output_logs 6-14 to pickle file
+"""
+output_log_numbers = []
+for i in range(6,30):
+    output_log_numbers.append(i)
+"""
+paths = []
+for num in output_log_numbers:
+    path = "output_logs/output_log%d/output_log%d.txt" % (num, num)
+    paths.append(path)
+print("paths: ", paths)
+
 
 # for every data text file
 for index,path in enumerate(paths):

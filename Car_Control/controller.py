@@ -22,7 +22,7 @@ PWMC1 = 24
 D1 = 12
 D2 = 26
 
-PWM = 50
+PWM = 45
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -50,106 +50,110 @@ def floattodeg (num):
 def setAngle(angle):
     angle = int(angle)
     #print("Angle: ", angle)
-    pulseWidth = angle*5.55555555555555555555555555555555555556 + 1055
+    # make this smaller to go to left
+    # larger to go to right
+    pulseWidth = angle*5.55555555555555555555555555555555555556 + 727
     #print("pulseWidth: ", pulseWidth)
     pi.set_servo_pulsewidth(servoPin,pulseWidth)
     time.sleep(0.05)
 
 #Sets motor output based on four input values through outputting to GPIO pins.
-def	set_motor(A1,A2,B1,B2):
-	GPIO.output(PWMA1,A1)
-	GPIO.output(PWMA2,A2)
-	GPIO.output(PWMB1,B1)
-	GPIO.output(PWMB2,B2)
+def set_motor(A1,A2,B1,B2):
+    GPIO.output(PWMA1,A1)
+    GPIO.output(PWMA2,A2)
+    GPIO.output(PWMB1,B1)
+    GPIO.output(PWMB2,B2)
 
 #Forward involves pushing both motors forward.
 def forward():
     #PWMA1 and PWMB1 set high.
-	set_motor(1,0,1,0)
+    set_motor(1,0,1,0)
 
 def stop():
-	set_motor(0,0,0,0)
+    set_motor(0,0,0,0)
 
 def reverse():
     #PWMA2 and PWMB2 set high.
-	set_motor(0,1,0,1)
+    set_motor(0,1,0,1)
 
 def left():
     #PWMA1 and PWMB2 set high.
-	set_motor(1,0,0,0)
+    set_motor(1,0,0,0)
 
 def right():
     #PWMA2 and PWMB1 set high.
-	set_motor(0,0,1,0)
+    set_motor(0,0,1,0)
 
 '''
 def getkey():
-	if GPIO.input(PIN) == 0:
-		count = 0
-		while GPIO.input(PIN) == 0 and count < 200:  #9ms
-			count += 1
-			time.sleep(0.00006)
-		count = 0
-		while GPIO.input(PIN) == 1 and count < 80:  #4.5ms
-			count += 1
-			time.sleep(0.00006)
-		idx = 0
-		cnt = 0
-		data = [0,0,0,0]
-		for i in range(0,32):
-			count = 0
-			while GPIO.input(PIN) == 0 and count < 15:    #0.56ms
-				count += 1
-				time.sleep(0.00006)
-			count = 0
-			while GPIO.input(PIN) == 1 and count < 40:   #0: 0.56ms
-				count += 1                               #1: 1.69ms
-				time.sleep(0.00006)
-			if count > 8:
-				data[idx] |= 1<<cnt
-			if cnt == 7:
-				cnt = 0
-				idx += 1
-			else:
-				cnt += 1
-		if data[0]+data[1] == 0xFF and data[2]+data[3] == 0xFF:  #check
-			return data[2]
+    if GPIO.input(PIN) == 0:
+        count = 0
+        while GPIO.input(PIN) == 0 and count < 200:  #9ms
+            count += 1
+            time.sleep(0.00006)
+        count = 0
+        B
+        while GPIO.input(PIN) == 1 and count < 80:  #4.5ms
+            count += 1
+            time.sleep(0.00006)
+        idx = 0
+        cnt = 0
+        data = [0,0,0,0]
+        for i in range(0,32):
+            count = 0
+            while GPIO.input(PIN) == 0 and count < 15:    #0.56ms
+                count += 1
+                time.sleep(0.00006)
+            count = 0
+            while GPIO.input(PIN) == 1 and count < 40:   #0: 0.56ms
+                count += 1                               #1: 1.69ms
+                time.sleep(0.00006)
+            if count > 8:
+                data[idx] |= 1<<cnt
+            if cnt == 7:
+                cnt = 0
+                idx += 1
+            else:
+                cnt += 1
+        if data[0]+data[1] == 0xFF and data[2]+data[3] == 0xFF:  #check
+            return data[2]
 print('IRM Test Start ...')
 stop()
 try:
-	while True:
-		key = readchar.readchar()
-		if(key != None):
-			print("Get the key: 0x%02x" %key)
-			if key == 'w':
-				forward()
-				print("forward")
-			if key == 'a':
-				left()
-				print("left")
-			if key == 's':
-				stop()
-				print("stop")
-			if key == 'd':
-				right()
-				print("right")
-			if key == 'x':
-				reverse()
-				print("reverse")
-			if key == 'e':
-				if(PWM + 10 < 101):
-					PWM = PWM + 10
-					p1.ChangeDutyCycle(PWM)
-					p2.ChangeDutyCycle(PWM)
-					print(PWM)
-			if key == 'q':
-				if(PWM - 10 > -1):
-					PWM = PWM - 10
-					p1.ChangeDutyCycle(PWM)
-					p2.ChangeDutyCycle(PWM)
-					print(PWM)
+    while True:
+        key = readchar.readchar()
+        if(key != None):
+            print("Get the key: 0x%02x" %key)
+            if key == 'w':
+                forward()
+                print("forward")
+            if key == 'a':
+                left()
+                print("left")
+            if key == 's':
+                stop()
+                print("stop")
+            if key == 'd':
+                right()
+                print("right")
+            if key == 'x':
+                reverse()
+                print("reverse")
+            if key == 'e':
+                if(PWM + 10 < 101):
+                    PWM = PWM + 10
+                    p1.ChangeDutyCycle(PWM)
+                    p2.ChangeDutyCycle(PWM)
+                    print(PWM)
+            if key == 'q':
+                if(PWM - 10 > -1):
+                    PWM = PWM - 10
+                    p1.ChangeDutyCycle(PWM)
+                    p2.ChangeDutyCycle(PWM)
+                    print(PWM)
 except KeyboardInterrupt:
-	GPIO.cleanup();
+    GPIO.cleanup();
+"""
 '''
 ##### ----------------------------------------###
 # This is a simple class that will help us print to the screen
@@ -271,53 +275,53 @@ while done==False:
 
         # axis 5 controls the motor pwm and forward and reverse
 
-	# forward/reverse
+    # forward/reverse
         #Axis 1 is the up/down axis on the left joystick.
-	speed = 40 # speed goes from 0 to 100% power
-        if(joystick.get_axis(1) >= 0):
+    speed = 45 # speed goes from 0 to 100% power
+    if(joystick.get_axis(1) >= 0):
 
-            forward()
-            #Currently maxes at 40% power.
-            PWM = joystick.get_axis(1)*speed
+        forward()
+        #Currently maxes at 40% power.
+        PWM = joystick.get_axis(1)*speed
 
-            p1.ChangeDutyCycle(PWM)
-            p2.ChangeDutyCycle(PWM)
-            print(PWM)
+        p1.ChangeDutyCycle(PWM)
+        p2.ChangeDutyCycle(PWM)
+        print(PWM)
 
-        elif(joystick.get_axis(1) < 0):
+    elif(joystick.get_axis(1) < 0):
 
-            reverse()
-            PWM = abs(joystick.get_axis(1))*speed
-            p1.ChangeDutyCycle(PWM)
-            p2.ChangeDutyCycle(PWM)
-            print(PWM)
+        reverse()
+        PWM = abs(joystick.get_axis(1))*speed
+        p1.ChangeDutyCycle(PWM)
+        p2.ChangeDutyCycle(PWM)
+        print(PWM)
 
-        # rotation
-        #Axis 2 is the right/left axis on the right joystick.
-        if(joystick.get_axis(2) >= 0):
-            #Maximum turn from servo is at 10.
-            #Servo is centered at 7.5 (car goes straight).
-            #PWM = 7.5 + joystick.get_axis(2)*2.5
-            #p3.ChangeDutyCycle(PWM)
-            #print(PWM)
-            # multiply by negative one because car is upside-down
-            angle = floattodeg(-1*joystick.get_axis(2))
-            setAngle(angle)
-            print("Angle: ",angle)
-            print("")
+    # rotation
+    #Axis 2 is the right/left axis on the right joystick.
+    if(joystick.get_axis(2) >= 0):
+        #Maximum turn from servo is at 10.
+        #Servo is centered at 7.5 (car goes straight).
+        #PWM = 7.5 + joystick.get_axis(2)*2.5
+        #p3.ChangeDutyCycle(PWM)
+        #print(PWM)
+        # multiply by negative one because car is upside-down
+        angle = floattodeg(joystick.get_axis(2))
+        setAngle(angle)
+        print("Angle: ",angle)
+        print("")
 
-        elif(joystick.get_axis(2) < 0):
-            #PWM = 7.5 - abs(joystick.get_axis(2))*2.5
-            #p3.ChangeDutyCycle(PWM)
-            #print(PWM)
+    elif(joystick.get_axis(2) < 0):
+        #PWM = 7.5 - abs(joystick.get_axis(2))*2.5
+        #p3.ChangeDutyCycle(PWM)
+        #print(PWM)
 
-            # multiply by negative one because car is upside-down
-            angle = floattodeg(-1*joystick.get_axis(2))
-            setAngle(angle)
-            print("Angle: ",angle)
-            print("")
-	else:
-	    #p3.ChangeDutyCycle(7.5)
+        # multiply by negative one because car is upside-down
+        angle = floattodeg(joystick.get_axis(2))
+        setAngle(angle)
+        print("Angle: ",angle)
+        print("")
+    else:
+        #p3.ChangeDutyCycle(7.5)
 
             setAngle(90)
             print("Angle: ",angle)
