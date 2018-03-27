@@ -108,7 +108,7 @@ Once you're done modifying the code, go to the Jetson TX2 and run
 ```
 python3 drive_jetson.py
 ```
-Once the Jetson TX2 starts starts printing out the frame shape, go to the Raspberry Pi and run
+Once the Jetson TX2 starts printing out the frame shape, go to the Raspberry Pi and run
 ```
 python3 drive_pi.py
 ```
